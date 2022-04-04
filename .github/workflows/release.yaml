@@ -9,7 +9,6 @@ jobs:
   
     build:
         name: Build release artifacts
-        needs: extractversion
         runs-on: ubuntu-latest
         strategy:
             matrix:
