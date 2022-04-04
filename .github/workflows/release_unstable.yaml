@@ -3,7 +3,8 @@ name: Publish Release from Tag
 on:
     push:
         tags:
-            - "*.*.*"
+            - "*.*.*-beta*"
+            - "*.*.*-rc*"
 
 jobs:
   
@@ -68,5 +69,6 @@ jobs:
               uses: softprops/action-gh-release@v1
               if: startsWith(github.ref, 'refs/tags/')
               with:
+                  prerelease: true
                   files: .artifacts/**
                   body_path: .artifacts/CHANGELOG.txt
