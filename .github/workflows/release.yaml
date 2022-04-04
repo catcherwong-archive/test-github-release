@@ -6,20 +6,7 @@ on:
             - "*.*.*"
 
 jobs:
-    extractversion:
-        name: Extract version
-        runs-on: ubuntu-latest
-        outputs:
-            version: ${{ steps.extractversion.outputs.version }}
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v1
-            - name: Extract version from Git
-              id: extractversion
-              run: echo "::set-output name=version::$(git describe)"
-            - name: github.ref
-              run: echo "${{ github.ref }}  ${{ github.ref_name }}"  
-
+  
     build:
         name: Build release artifacts
         needs: extractversion
@@ -48,19 +35,20 @@ jobs:
             - name: Publish .NET app
               env:
                   RID: ${{ matrix.targets }}
-                  VERSION: ${{ needs.extractversion.outputs.version }}
+                  VERSION: ${{ github.ref_name }}
               run: dotnet publish -c Release -r $RID --self-contained true -p:DebugType=None -p:DebugSymbols=false -p:PublishSingleFile=true CliSample/CliSample.csproj --output /home/runner/work/clis/$RID
             - name: Package assets
               env:
                   RID: ${{ matrix.targets }}
-                  VERSION: ${{ needs.extractversion.outputs.version }}
+                  VERSION: ${{ github.ref_name }}
               run: |
+                  ls /home/runner/work/clis/
                   zip -r /home/runner/work/release/clisample-$VERSION-$RID.zip /home/runner/work/clis/$RID/*
             - name: Upload artifacts
               uses: actions/upload-artifact@v2
               with:
-                  name: clisample-${{ needs.extractversion.outputs.version }}-${{ matrix.targets }}.zip
-                  path: "/home/runner/work/release/clisample-${{ needs.extractversion.outputs.version }}-${{ matrix.targets }}.zip"
+                  name: clisample-${{ github.ref_name }}-${{ matrix.targets }}.zip
+                  path: "/home/runner/work/release/clisample-${{ github.ref_name }}-${{ matrix.targets }}.zip"
 
     publish:
         name: Publish release
