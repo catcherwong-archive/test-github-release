@@ -17,6 +17,8 @@ jobs:
             - name: Extract version from Git
               id: extractversion
               run: echo "::set-output name=version::$(git describe)"
+            - name: github.ref
+              run: echo "${{ github.ref }}  ${{ github.ref_name }}"  
 
     build:
         name: Build release artifacts
@@ -47,7 +49,7 @@ jobs:
               env:
                   RID: ${{ matrix.targets }}
                   VERSION: ${{ needs.extractversion.outputs.version }}
-              run: dotnet publish -c Release -r $RID --self-contained true -p:DebugType=None -p:DebugSymbols=false -p:PublishSingleFile=true -p:Version=$VERSION CliSample/CliSample.csproj --output /home/runner/work/clis/$RID
+              run: dotnet publish -c Release -r $RID --self-contained true -p:DebugType=None -p:DebugSymbols=false -p:PublishSingleFile=true CliSample/CliSample.csproj --output /home/runner/work/clis/$RID
             - name: Package assets
               env:
                   RID: ${{ matrix.targets }}
